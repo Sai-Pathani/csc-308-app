@@ -36,10 +36,19 @@ function MyApp() {
   }, []);
 
   function removeOneCharacter(index) {
-    const updated = characters.filter((character, i) => {
-      return i !== index;
+    const id = characters[index].id;
+    fetch("http://localhost:8000/users/" + id, {
+      method: "DELETE",
+    }).then((res) => {
+      if (res.status === 204) {
+        const updated = characters.filter((character) => {
+          return character.id !== id;
+        });
+        setCharacters(updated);
+      } else {
+        console.log("Could not delete user.");
+      }
     });
-    setCharacters(updated);
   }
 
   function postUser(person) {
@@ -56,7 +65,13 @@ function MyApp() {
 
   function updateList(person) {
     postUser(person)
-      .then(() => setCharacters([...characters, person]))
+      .then((res) => {
+        if (res.status === 201) {
+          res
+            .json()
+            .then((newPerson) => setCharacters([...characters, newPerson]));
+        }
+      })
       .catch((error) => console.log(error));
   }
 

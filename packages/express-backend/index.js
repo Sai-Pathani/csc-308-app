@@ -90,24 +90,36 @@ app.get("/users/:id", (req, res) => {
 });
 
 const addUser = (user) => {
+  user.id = Math.random().toString(36).substring(2, 7);
   users["users_list"].push(user);
   return user;
 };
 
 app.post("/users", (req, res) => {
   const userToAdd = req.body;
-  addUser(userToAdd);
-  res.send();
+  res.status(201).send(addUser(userToAdd));
 });
 
 const deleteUserById = (id) => {
-  users["users_list"] = users["users_list"].filter((user) => user["id"] !== id);
+  const user = findUserById(id);
+  if (user === undefined) {
+    return false;
+  } else {
+    users["users_list"] = users["users_list"].filter(
+      (user) => user["id"] !== id,
+    );
+    return true;
+  }
 };
 
 app.delete("/users/:id", (req, res) => {
   const id = req.params["id"];
-  deleteUserById(id);
-  res.send();
+  const deleted = deleteUserById(id);
+  if (deleted) {
+    res.status(204).send();
+  } else {
+    res.status(404).send("Resource not found");
+  }
 });
 
 app.listen(port, () => {
