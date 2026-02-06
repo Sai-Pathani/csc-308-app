@@ -31,18 +31,18 @@ function MyApp() {
   useEffect(() => {
     fetchUsers()
       .then((res) => res.json())
-      .then((json) => setCharacters(json["users_list"]))
+      .then((json) => setCharacters(json))
       .catch((error) => console.log(error));
   }, []);
 
   function removeOneCharacter(index) {
-    const id = characters[index].id;
+    const id = characters[index]._id;
     fetch("http://localhost:8000/users/" + id, {
       method: "DELETE",
     }).then((res) => {
       if (res.status === 204) {
         const updated = characters.filter((character) => {
-          return character.id !== id;
+          return character._id !== id;
         });
         setCharacters(updated);
       } else {
